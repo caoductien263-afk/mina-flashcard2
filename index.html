@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mina Flashcard</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div id="app">
+        <section id="home-screen" class="screen">
+            <h1>🎴 Mina Flashcard</h1>
+            
+            <div id="daily-schedule" class="schedule-box hidden">
+                <h3>📅 Việc cần làm hôm nay</h3>
+                <ul id="task-list"></ul>
+            </div>
+
+            <button onclick="createNewDeck()" class="success" style="width:100%; margin-bottom:15px; padding: 15px;">+ Tạo bài học mới</button>
+            
+            <h3 style="margin-bottom:10px">Danh sách bài học</h3>
+            <div id="deck-list" class="menu-grid"></div>
+            
+            <hr>
+            <div class="menu-grid">
+                <button onclick="exportData()" class="secondary">⬇️ Sao lưu</button>
+                <label for="import-file" class="custom-file-upload secondary">⬆️ Khôi phục</label>
+                <input type="file" id="import-file" onchange="importData(event)" style="display:none;">
+            </div>
+        </section>
+
+        <section id="deck-detail-screen" class="screen hidden">
+            <h2 id="current-deck-name">Tên tập thẻ</h2>
+            <div class="menu-grid">
+                <div class="actions">
+                    <button onclick="showScreen('import-screen')" class="primary">📥 Nhập từ</button>
+                    <button onclick="shuffleDeck()" class="secondary">🔀 Trộn thẻ</button>
+                </div>
+                
+                <div class="actions">
+                    <button onclick="startStudy(false)" class="success">🎴 Học thẻ</button>
+                    <button onclick="startQuiz(false)" class="success">📝 Trắc nghiệm</button>
+                </div>
+                
+                <div class="actions">
+                    <button onclick="startStudy(true)" class="warning">⭐ Ôn câu khó</button>
+                    <button onclick="startQuiz(true)" class="warning">❓ Quiz câu khó</button>
+                </div>
+
+                <button onclick="showScreen('home-screen')" class="secondary">Quay lại</button>
+                <button onclick="deleteCurrentDeck()" class="danger">🗑️ Xóa bài</button>
+            </div>
+            <hr>
+            <h3>Danh sách từ (<span id="card-count">0</span>)</h3>
+            <div id="card-list" class="card-list-container"></div>
+        </section>
+
+        <section id="import-screen" class="screen hidden">
+            <h2>Nhập dữ liệu nhanh</h2>
+            <p>Định dạng: <code>Tiếng Nhật - Nghĩa 1, nghĩa 2</code></p>
+            <textarea id="bulk-input" placeholder="Ví dụ:&#10;かぞえます - Đếm, thống kê&#10;はかります - Đo, cân, tính toán"></textarea>
+            <div class="actions">
+                <button onclick="handleBulkImport()">Xác nhận</button>
+                <button onclick="showScreen('deck-detail-screen')" class="secondary">Hủy</button>
+            </div>
+        </section>
+
+        <section id="study-screen" class="screen hidden">
+            <div class="nav-bar">
+                <button class="nav-btn" onclick="prevCard()">← Trước</button>
+                <span id="study-progress" style="font-weight:bold;">0/0</span>
+                <button class="nav-btn" onclick="nextCard()">Sau →</button>
+            </div>
+            
+            <div class="card" id="main-card" onclick="flipCard()">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div id="star-btn" onclick="toggleStarCurrent(event)">☆</div>
+                        <div id="front-text">Mặt trước</div>
+                        <small style="color:#999; margin-top:20px">(Chạm để xem nghĩa)</small>
+                    </div>
+                    <div class="card-back">
+                        <div id="back-text">Mặt sau</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions hidden" id="study-controls">
+                <button onclick="markKnown(true)" class="success">Đã thuộc</button>
+                <button onclick="markKnown(false)" class="danger">Chưa thuộc</button>
+            </div>
+            <button onclick="showScreen('deck-detail-screen')" class="secondary" style="margin-top: 15px;">Thoát</button>
+        </section>
+
+        <section id="quiz-screen" class="screen hidden">
+            <div class="question-box">
+                <div class="question" id="quiz-question">?</div>
+            </div>
+            <div id="quiz-options" class="options-grid"></div>
+            <button onclick="showScreen('deck-detail-screen')" class="secondary" style="margin-top:20px">Thoát</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Registered"))
+            .catch(err => console.log("Service Worker Failed", err));
+        }
+    </script>
+</body>
+</html>
